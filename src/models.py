@@ -1,11 +1,30 @@
 import os
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Table, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy import create_engine
 from eralchemy2 import render_er
 
 Base = declarative_base()
+
+
+favorite_planets = Table(
+    'favorite_planets', Base.metadata,
+     Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
+     Column('planets_id', Integer, ForeignKey('planets.id'),primary_key=True)
+)
+
+favorite_characters = Table(
+    'favorite_characters', Base.metadata,
+     Column('user.id', Integer, ForeignKey('users.id'),primary_key=True),
+     Column('characters_id', Integer, ForeignKey('characters.id'),primary_key=True)
+)
+
+favorite_vehicles = Table(
+    'favorite_vehicles', Base.metadata,
+     Column('user.id', Integer, ForeignKey('users.id'),primary_key=True),
+     Column('vehicles_id', Integer, ForeignKey('vehicles.id'),primary_key=True)
+)
 
 
 class Vehicles(Base):
@@ -53,6 +72,8 @@ class Characters(Base):
     planets_id = Column(Integer, ForeignKey('planets.id'))
     planets = relationship(Planets)
 
+
+
 class Users(Base):
     __tablename__ = 'users'
     # Here we define columns for the table user
@@ -63,12 +84,14 @@ class Users(Base):
     email = Column(String(250), nullable=False)
 
     #Users Relations
-  	
-    favorites_characters = Column(Integer, ForeignKey('characters.id'))
-    characters = relationship(Characters)
+    favorite_planets = relationship('Planets', secondary=favorite_planets, backref= 'favorited_by')
+    favorite_characters = relationship('Characters', secondary=favorite_characters, backref= 'favorited_by')
+    favorite_vehicles = relationship('Vehicles', secondary=favorite_vehicles, backref= 'favorited_by')
+    # favorites_characters = Column(Integer, ForeignKey('characters.id'))
+    # characters = relationship(Characters)
 
 
-    def to_dict(self):
+def to_dict(self):
         return {}
 
 ## Draw from SQLAlchemy base
